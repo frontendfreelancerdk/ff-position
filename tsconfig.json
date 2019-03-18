@@ -16,6 +16,14 @@
     "lib": [
       "es2018",
       "dom"
-    ]
+    ],
+    "paths": {
+      "ff-position": [
+        "dist/ff-position"
+      ],
+      "ff-position/*": [
+        "dist/ff-position/*"
+      ]
+    }
   }
 }

@@ -133,6 +133,41 @@
           }
         }
       }
+    },
+    "ff-position": {
+      "root": "projects/ff-position",
+      "sourceRoot": "projects/ff-position/src",
+      "projectType": "library",
+      "prefix": "ff",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/ff-position/tsconfig.lib.json",
+            "project": "projects/ff-position/ng-package.json"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/ff-position/src/test.ts",
+            "tsConfig": "projects/ff-position/tsconfig.spec.json",
+            "karmaConfig": "projects/ff-position/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/ff-position/tsconfig.lib.json",
+              "projects/ff-position/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
     }
   },
   "defaultProject": "ff-position-app"

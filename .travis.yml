@@ -1,0 +1,18 @@
+sudo: required
+addons:
+  chrome: stable
+language: node_js
+node_js:
+  - node
+script:
+  - npm run test_lib
+  - npm run build_lib
+before_deploy:
+  - cd dist/ff-position
+deploy:
+  provider: npm
+  skip_cleanup: true
+  email: developer@frontend-freelancer.com
+  on:
+    tags: true
+    branch: master

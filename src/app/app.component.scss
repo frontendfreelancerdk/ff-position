@@ -1,0 +1,39 @@
+.forSize {
+  height: 110vh;
+  background-color: lightgreen;
+}
+
+.workspace {
+  background-color: black;
+  margin: auto;
+  height: 700px;
+  position: relative;
+}
+
+.mainUl {
+  position: absolute;
+  top: 40px;
+  left: 40px;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.dropUl {
+  margin: 0;
+  padding: 0;
+}
+
+.tooltip {
+  color: #fff;
+  margin: 0;
+  padding: 5px;
+  border-radius: 3px;
+  background-color: rgba(255, 255, 255, .5);
+}

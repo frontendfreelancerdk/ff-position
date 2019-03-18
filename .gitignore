@@ -37,3 +37,9 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+
+# Coverage
+/projects/ff-overlay/coverage
+
+# Readme
+/projects/ff-overlay/README.md
