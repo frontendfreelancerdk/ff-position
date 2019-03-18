@@ -1,19 +1,13 @@
 import {TestBed} from '@angular/core/testing';
 
 import {FFPositionService} from './ff-position.service';
-import {FFPositionComponent} from './ff-position.component';
-import {BrowserDynamicTestingModule} from '@angular/platform-browser-dynamic/testing';
+import {FFOverlayModule} from 'ff-overlay';
 
 describe('FfShowPositionService', () => {
   beforeEach(() => {
       TestBed.configureTestingModule({
-        declarations: [FFPositionComponent]
+        imports: [FFOverlayModule]
       });
-    TestBed.overrideModule(BrowserDynamicTestingModule, {
-      set: {
-        entryComponents: [FFPositionComponent]
-      }
-    });
     }
   );
 

@@ -3,12 +3,12 @@ addons:
   chrome: stable
 language: node_js
 node_js:
-  - node
+- node
 script:
-  - npm run test_lib
-  - npm run build_lib
+- npm run test_lib
+- npm run build_lib
 before_deploy:
-  - cd dist/ff-position
+- cd dist/ff-position
 deploy:
   provider: npm
   skip_cleanup: true
@@ -16,3 +16,5 @@ deploy:
   on:
     tags: true
     branch: master
+  api_key:
+    secure: hIQ1dc2FaaqTE3gJp7nUSCJsH7DtkONsR0v9XzVUQPkBWHbp1OYYeP6a1s8azqQs96cjEiOgSbhN6GQRZSmvoYur27Cjht9MQobxYGQFUEI+EFoGu+mr6rBe1F5K1eToAkySu5D98VmX0c8i2C+4NYsjyVYZDt0WwD8SWzCTBIQxq99R/et/yjhQBJ2MrlPDXwMme83x2QIg6dB5OWMIlvs/fVo9Rnqzwr9cvJwKD0Zc35qAROhr388gc7ddOHrvgI+mxpgQzKJB/y/d1yVkSu9JEWVskLjJ14iTqVDACNmiBdruGdDu+wBLUq6+8xrTjEWiLCDjsapnTtiWPJZg08m7clyYbxfjHmKKIzeHxQE0rAZScsdRcCuvpfRPwkZ7Xr+EWGUdSZJJO77Ktmv1c5nvPHdi8wybLoPuMLrVbv5GE85/oVvW4FPdXrC2/r4r572bzqWMqOf07HOSNCXUQbqH8B35/BfzTEC0a81MxU6Mxvsglr0X+CAwPmISfzBqxT+sdOSYG34dHzt+wo31imQP+AzMwZSoYpqni5miZEb+AGZs8PpUZBySBKWXS+u0qT0bqBfxbGMKBY4Bf98JCOkzP9nShsDZyXivSVY+zmaOHidczlRj3QVdyxuS4MpEo9skTnFiC2kjWr5aXsqBAk5H3UV3IAHOamTSmCPU+4U=
