@@ -67,10 +67,9 @@ export class FFPositionService implements OnDestroy {
     });
   }
 
-  calculateStyle(el, target, x, y, overflow) {
+  private _calculateStyle(el, target, x: xAxis, y: yAxis) {
     this._getWindowSize();
     const elRect = el.getBoundingClientRect();
-
     const targetRect = target.getBoundingClientRect();
     const newRect: BoundingRect = {
       top: 0,
@@ -80,133 +79,58 @@ export class FFPositionService implements OnDestroy {
       justifyContent: 'flex-start',
       alignItems: 'flex-start'
     };
-    /*    if ((targetRect.bottom <= 0 || targetRect.right <= 0) || (targetRect.top >= this.windowSize.height || targetRect.left >= this.windowSize.width)) {
-          return newRect;
-        }*/
-    if (x === 'right' && y === 'start') {
-      newRect.top = targetRect.top;
-      newRect.left = targetRect.right;
-      newRect.height = this.windowSize.height - targetRect.top;
-      newRect.width = this.windowSize.width - targetRect.right;
-      newRect.alignItems = 'flex-start';
-      newRect.justifyContent = 'flex-start';
-    }
 
-    if (x === 'left' && y === 'start') {
-      newRect.top = targetRect.top;
-      newRect.left = 0;
-      newRect.height = this.windowSize.height - targetRect.top;
-      newRect.width = targetRect.left;
-      newRect.alignItems = 'flex-start';
-      newRect.justifyContent = 'flex-end';
-    }
-
-    if (x === 'right' && y === 'end') {
-      newRect.top = 0;
-      newRect.left = targetRect.right;
-      newRect.height = (targetRect.top + targetRect.height) < 0 ? 0 : (targetRect.top + targetRect.height);
-      newRect.width = this.windowSize.width - targetRect.right;
-      // newRect.alignItems = targetRect.top + targetRect.height <= elRect.height ? 'flex-start' : 'flex-end';
-      newRect.alignItems = 'flex-end';
-      newRect.justifyContent = 'flex-start';
-    }
-
-    if (x === 'left' && y === 'end') {
-      newRect.top = 0;
-      newRect.left = 0;
-      newRect.height = (targetRect.top + targetRect.height) < 0 ? 0 : (targetRect.top + targetRect.height);
-      newRect.width = targetRect.left;
-      // newRect.alignItems = targetRect.top + targetRect.height <= elRect.height ? 'flex-start' : 'flex-end';
-      newRect.alignItems = 'flex-end';
-      newRect.justifyContent = 'flex-end';
-
-    }
-
-    if (x === 'right' && y === 'center') {
-      const top = (targetRect.top + targetRect.height / 2) - elRect.height / 2;
-      newRect.top = top;
-      newRect.left = targetRect.right;
-      // newRect.height = this.windowSize.height - top;
-      newRect.height = 'auto';
-      newRect.width = this.windowSize.width - targetRect.right;
-      newRect.justifyContent = 'flex-start';
-      newRect.alignItems = 'flex-start';
-    }
-    if (x === 'left' && y === 'center') {
-      const top = (targetRect.top + targetRect.height / 2) - elRect.height / 2;
-      newRect.top = top;
-      newRect.left = 0;
-      // newRect.height = this.windowSize.height - top;
-      newRect.height = 'auto';
-      newRect.width = targetRect.left;
-      newRect.justifyContent = 'flex-end';
-      newRect.alignItems = 'flex-start';
-
-    }
-
-    if (x === 'top' && y === 'start') {
-      newRect.top = 0;
-      newRect.left = targetRect.left;
-      newRect.height = targetRect.top < 0 ? 0 : targetRect.top;
-      newRect.width = this.windowSize.width - targetRect.left;
-      newRect.justifyContent = 'flex-start';
-      newRect.alignItems = 'flex-end';
-    }
-    if (x === 'top' && y === 'end') {
-      newRect.top = 0;
-      newRect.left = 0;
-      newRect.height = targetRect.top < 0 ? 0 : targetRect.top;
-      newRect.width = targetRect.right;
-      newRect.justifyContent = 'flex-end';
-      newRect.alignItems = 'flex-end';
-    }
-
-    if (x === 'bottom' && y === 'start') {
-      newRect.top = targetRect.bottom;
-      newRect.left = targetRect.left;
-      newRect.height = this.windowSize.height - targetRect.bottom;
-      newRect.width = this.windowSize.width - targetRect.left;
-      newRect.justifyContent = 'flex-start';
-      newRect.alignItems = 'flex-start';
-    }
-    if (x === 'bottom' && y === 'end') {
-      newRect.top = targetRect.bottom;
-      newRect.left = 0;
-      newRect.height = this.windowSize.height - targetRect.bottom;
-      newRect.width = targetRect.right;
-      newRect.justifyContent = 'flex-end';
-      newRect.alignItems = 'flex-start';
-    }
-
-    if (x === 'top' && y === 'center') {
-      const left = (targetRect.left + targetRect.width / 2) - elRect.width / 2;
-      newRect.top = 0;
-      newRect.left = left;
-      newRect.height = targetRect.top;
-      newRect.width = 'auto';
-      newRect.justifyContent = 'flex-start';
-      newRect.alignItems = 'flex-end';
-    }
-    if (x === 'bottom' && y === 'center') {
-      const left = (targetRect.left + targetRect.width / 2) - elRect.width / 2;
-      newRect.top = targetRect.bottom;
-      newRect.left = left;
-      newRect.height = this.windowSize.height - targetRect.bottom;
-      newRect.width = 'auto';
-      newRect.justifyContent = 'flex-start';
-      newRect.alignItems = 'flex-start';
+    if (x === 'right' || x === 'left') {
+      if (x === 'right') {
+        newRect.left = targetRect.right;
+        newRect.width = this.windowSize.width - targetRect.right;
+      } else if (x === 'left') {
+        newRect.width = targetRect.left;
+        newRect.justifyContent = 'flex-end';
+      }
+      if (y === 'start') {
+        newRect.top = targetRect.top;
+        newRect.height = this.windowSize.height - targetRect.top;
+      } else if (y === 'end') {
+        newRect.height = (targetRect.top + targetRect.height) < 0 ? 0 : (targetRect.top + targetRect.height);
+        newRect.alignItems = 'flex-end';
+      } else if (y === 'center') {
+        newRect.top = (targetRect.top + targetRect.height / 2) - elRect.height / 2;
+        newRect.height = 'auto';
+      }
+    } else if (x === 'top' || x === 'bottom') {
+      if (x === 'top') {
+        newRect.alignItems = 'flex-end';
+        if (y === 'start' || y === 'end') {
+          newRect.height = targetRect.top < 0 ? 0 : targetRect.top;
+        } else if (y === 'center') {
+          newRect.height = targetRect.top;
+        }
+      } else if (x === 'bottom') {
+        newRect.top = targetRect.bottom;
+        newRect.height = this.windowSize.height - targetRect.bottom;
+      }
+      if (y === 'start') {
+        newRect.left = targetRect.left;
+        newRect.width = this.windowSize.width - targetRect.left;
+      } else if (y === 'end') {
+        newRect.width = targetRect.right;
+        newRect.justifyContent = 'flex-end';
+      } else if (y === 'center') {
+        newRect.width = 'auto';
+        newRect.left = (targetRect.left + targetRect.width / 2) - elRect.width / 2;
+      }
     }
     return newRect;
   }
 
-  init(el, target, x = 'right', y = 'start', overflow: boolean = false) {
-
+  init(el, target, x: xAxis = 'right', y: yAxis = 'start') {
     const wrapper = this.createWrapper();
     this.renderer.appendChild(this.overlayService.getOverlay(), wrapper);
     this.renderer.appendChild(wrapper, el);
-    this.setStyle(wrapper, this.calculateStyle(el, target, x, y, overflow));
+    this.setStyle(wrapper, this._calculateStyle(el, target, x, y));
     this._subscriptions[0].subscribe(() => {
-      this.setStyle(wrapper, this.calculateStyle(el, target, x, y, overflow));
+      this.setStyle(wrapper, this._calculateStyle(el, target, x, y));
     });
 
 
