@@ -37,3 +37,14 @@
   border-radius: 3px;
   background-color: rgba(255, 255, 255, .5);
 }
+
+.btnX, .btnY {
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.btnY {
+  right: 0;
+  left: auto;
+}

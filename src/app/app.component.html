@@ -4,22 +4,22 @@
 <div class="workspace">
   <ul class="mainUl">
     <li>
-      <button #trigger1>lorem 1</button>
+      <button #trigger1 (click)="menuToggle()">lorem 1</button>
     </li>
     <li>
-      <button #trigger2>lorem 2</button>
+      <button #trigger2 (mouseenter)="tooltipOpen()" (mouseleave)="tooltipClose()">lorem 2</button>
     </li>
     <li>
-      <button #trigger3>lorem 3</button>
+      <button>lorem 3</button>
     </li>
     <li>
-      <button #trigger4>lorem 4</button>
+      <button>lorem 4</button>
     </li>
     <li>
-      <button #trigger5>lorem 5</button>
+      <button>lorem 5</button>
     </li>
     <li>
-      <button #trigger6>lorem 6</button>
+      <button>lorem 6</button>
     </li>
   </ul>
 </div>
@@ -28,7 +28,6 @@
 </div>
 
 
-<div class="overlay">
   <ul class="dropUl" #dropMenu>
     <li>
       <button>ipsum 1</button>
@@ -37,7 +36,7 @@
       <button>ipsum 2</button>
     </li>
     <li>
-      <button>ipsum 3</button>
+      <button (click)="menu2Toggle()" #trigger3>ipsum 3</button>
     </li>
     <li>
       <button>ipsum 4</button>
@@ -53,6 +52,22 @@
     </li>
   </ul>
 
-  <!--<p class="tooltip" #tooltip>Lorem ipsum dolor.</p>-->
-</div>
+  <ul class="dropUl" #dropMenu2>
+    <li>
+      <button>ipsum 1</button>
+    </li>
+    <li>
+      <button>ipsum 2</button>
+    </li>
+    <li>
+      <button>ipsum 3</button>
+    </li>
+    <li>
+      <button>ipsum 4</button>
+    </li>
+  </ul>
 
+  <p class="tooltip" #tooltip>Lorem ipsum dolor.</p>
+
+<button class="btnX" (click)="toggleX()">{{x}}</button>
+<button class="btnY"(click)="toggleY()">{{y}}</button>

@@ -1,6 +1,5 @@
 import {AfterViewInit, Component, ViewChild} from '@angular/core';
 import {FFPositionService, xAxis, yAxis} from '../../projects/ff-position/src/lib/ff-position.service';
-import {el} from '@angular/platform-browser/testing/src/browser_util';
 
 @Component({
   selector: 'ff-root',
@@ -12,8 +11,18 @@ export class AppComponent implements AfterViewInit {
   @ViewChild('trigger2') trigger2;
   @ViewChild('trigger3') trigger3;
   @ViewChild('dropMenu') dropMenu;
+  @ViewChild('dropMenu2') dropMenu2;
   @ViewChild('tooltip') tooltip;
   title = 'ff-position-app';
+  xAxis: xAxis[] = ['right', 'left', 'top', 'bottom'];
+  yAxis: yAxis[] = ['start', 'end', 'center'];
+  i = 0;
+  j = 0;
+  x: xAxis = this.xAxis[this.i];
+  y: yAxis = this.yAxis[this.i];
+  _t: any;
+  _d: any;
+  _d2: any;
 
 
   constructor(private service: FFPositionService) {
@@ -21,20 +30,34 @@ export class AppComponent implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.service.init(this.dropMenu.nativeElement, this.trigger1.nativeElement, 'right', 'center');
-    // this.service.init(this.tooltip.nativeElement, this.trigger1.nativeElement, 'left', 'center');
 
-    // this.forTest();
-    // this.lightTest();
   }
 
-  lightTest() {
-    let i = 0;
-    setInterval(() => {
-        this.service.init(this.dropMenu.nativeElement, this.trigger1.nativeElement, i % 2 ? 'left' : 'right', 'center');
-        i++;
-      }, 5000
-    );
+  menuToggle() {
+    if (this._d) {
+      this._d = this.service.destroy(this._d);
+    } else {
+      this._d = this.service.init(this.dropMenu.nativeElement, this.trigger1.nativeElement, this.x, this.y);
+    }
+  }
+
+  menu2Toggle() {
+    if (this._d2) {
+      this._d2 = this.service.destroy(this._d2);
+    } else {
+      this._d2 = this.service.init(this.dropMenu2.nativeElement, this.trigger3.nativeElement, this.x, this.y);
+    }
+  }
+
+  tooltipOpen() {
+    if (this._t) {
+      return;
+    }
+    this._t = this.service.init(this.tooltip.nativeElement, this.trigger2.nativeElement, 'top', 'center');
+  }
+
+  tooltipClose() {
+    this._t = this.service.destroy(this._t);
   }
 
   forTest() {
@@ -51,12 +74,27 @@ export class AppComponent implements AfterViewInit {
 
       if (j < y.length) {
         this.service.init(this.tooltip.nativeElement, this.trigger1.nativeElement, x[i], y[j]);
-        console.log(`x: ${x[i]}, y: ${y[j]}`);
         j++;
       } else {
         j = 0;
         i++;
       }
     }, 5000);
+  }
+
+  toggleX() {
+    this.i++;
+    if (this.i >= this.xAxis.length) {
+      this.i = 0;
+    }
+    this.x = this.xAxis[this.i];
+  }
+
+  toggleY() {
+    this.j++;
+    if (this.j >= this.xAxis.length) {
+      this.j = 0;
+    }
+    this.y = this.yAxis[this.j];
   }
 }
