@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, ViewChild} from '@angular/core';
-import {FFPositionService, xAxis, yAxis} from '../../projects/ff-position/src/lib/ff-position.service';
+import {FFPositionService, xAxis, yAxis} from 'ff-position';
 
 @Component({
   selector: 'ff-root',

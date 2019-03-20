@@ -48,3 +48,9 @@
   right: 0;
   left: auto;
 }
+
+ul {
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto;
+}

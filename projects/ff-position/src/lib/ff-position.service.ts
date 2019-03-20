@@ -10,10 +10,7 @@ import {DOCUMENT} from '@angular/common';
 import {from, fromEvent} from 'rxjs';
 import {mergeMap} from 'rxjs/operators';
 import {FFOverlayService} from 'ff-overlay';
-
-export type xAxis = 'top' | 'right' | 'bottom' | 'left' | 'center';
-
-export type yAxis = 'start' | 'center' | 'end' | 'before' | 'after';
+import {xAxis, yAxis} from './ff-position.types';
 
 export interface BoundingRect {
   top: number | string;
@@ -127,6 +124,7 @@ export class FFPositionService implements OnDestroy {
     const elRect = el.getBoundingClientRect();
     const targetRect = target.getBoundingClientRect();
     const wrapperRect = this._calculateStyle(elRect, targetRect, x, y);
+    // TODO remove this shit and make clever method for get new axis;
     if (wrapperRect.width < elRect.width && x === 'right' && previous.indexOf('right') === -1) {
       previous.push('right');
       return this._calculatePosition(el, target, 'left', y, previous);
@@ -147,10 +145,10 @@ export class FFPositionService implements OnDestroy {
     const wrapper = this.createWrapper();
     this.renderer.appendChild(this.overlayService.getOverlay(), wrapper);
     this.renderer.appendChild(wrapper, el);
-    this.setStyle(wrapper, this._calculatePosition(el, target, x, y));
     this._subscriptions[0].subscribe(() => {
       this.setStyle(wrapper, this._calculatePosition(el, target, x, y));
     });
+    this.setStyle(wrapper, this._calculatePosition(el, target, x, y));
     return wrapper;
   }
 
