@@ -14,6 +14,7 @@ export class AppComponent implements AfterViewInit {
   @ViewChild('dropMenu2') dropMenu2;
   @ViewChild('tooltip') tooltip;
   title = 'ff-position-app';
+  scroll = false;
   xAxis: xAxis[] = ['right', 'left', 'top', 'bottom'];
   yAxis: yAxis[] = ['start', 'end', 'center'];
   i = 0;
@@ -37,7 +38,7 @@ export class AppComponent implements AfterViewInit {
     if (this._d) {
       this._d = this.service.destroy(this._d);
     } else {
-      this._d = this.service.init(this.dropMenu.nativeElement, this.trigger1.nativeElement, this.x, this.y);
+      this._d = this.service.init(this.dropMenu.nativeElement, this.trigger1.nativeElement, this.x, this.y, this.scroll);
     }
   }
 
@@ -45,7 +46,7 @@ export class AppComponent implements AfterViewInit {
     if (this._d2) {
       this._d2 = this.service.destroy(this._d2);
     } else {
-      this._d2 = this.service.init(this.dropMenu2.nativeElement, this.trigger3.nativeElement, this.x, this.y);
+      this._d2 = this.service.init(this.dropMenu2.nativeElement, this.trigger3.nativeElement, this.x, this.y, this.scroll);
     }
   }
 
@@ -96,5 +97,9 @@ export class AppComponent implements AfterViewInit {
       this.j = 0;
     }
     this.y = this.yAxis[this.j];
+  }
+
+  toggleScroll() {
+    this.scroll = !this.scroll;
   }
 }

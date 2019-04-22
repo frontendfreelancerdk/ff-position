@@ -12,6 +12,11 @@ import {mergeMap} from 'rxjs/operators';
 import {FFOverlayService} from 'ff-overlay';
 import {xAxis, yAxis} from './ff-position.types';
 
+export interface Direction {
+  x: xAxis;
+  y: yAxis;
+}
+
 export interface BoundingRect {
   top: number | string;
   left: number | string;
@@ -33,7 +38,7 @@ export class FFPositionService implements OnDestroy {
     width: 0
   };
 
-  private _subscriptions = [];
+  private _subscription;
 
   private get windowSize() {
     return this._windowSize;
@@ -48,12 +53,10 @@ export class FFPositionService implements OnDestroy {
     this._document = document as Document;
     this.renderer = rendererFactory.createRenderer(null, null);
 
-    this._subscriptions.push(
+    this._subscription =
       from(['resize', 'orientationchange', 'scroll']).pipe(
-        mergeMap((event) => fromEvent(window, event))
-      )
-    );
-    this._subscriptions[0].subscribe((e) => {
+        mergeMap((event) => fromEvent(window, event)));
+    this._subscription.subscribe((e) => {
       if (e.type !== 'scroll') {
         this._getWindowSize();
       }
@@ -61,7 +64,7 @@ export class FFPositionService implements OnDestroy {
     });
   }
 
-  private _calculateStyle(elRect, targetRect, x: xAxis, y: yAxis) {
+  private _calculateStyle(elRect, targetRect, x: xAxis, y: yAxis, scroll) {
     const newRect: BoundingRect = {
       top: 0,
       left: 0,
@@ -74,7 +77,7 @@ export class FFPositionService implements OnDestroy {
     if (x === 'right' || x === 'left') {
       if (x === 'right') {
         newRect.left = targetRect.right;
-        newRect.width = this.windowSize.width - targetRect.right - this._margin;
+        newRect.width = this._windowSize.width - targetRect.right - this._margin;
       } else if (x === 'left') {
         newRect.width = targetRect.left - this._margin;
         newRect.left = this._margin;
@@ -82,24 +85,21 @@ export class FFPositionService implements OnDestroy {
       }
       if (y === 'start') {
         newRect.top = targetRect.top;
-        newRect.height = this.windowSize.height - targetRect.top - this._margin;
+        newRect.height = this.windowSize.height - targetRect.top - (scroll ? this._margin : 0);
       } else if (y === 'end') {
         newRect.height = (targetRect.top + targetRect.height) < 0 ? 0 : (targetRect.top + targetRect.height - this._margin);
-        newRect.alignItems = 'flex-end';
+        newRect.alignItems = (newRect.height <= elRect.height && scroll) ? 'flex-start' : 'flex-end';
         newRect.top = this._margin;
       } else if (y === 'center') {
         newRect.top = (targetRect.top + targetRect.height / 2) - elRect.height / 2;
+        // TODO fix that:
         newRect.height = 'auto';
       }
     } else if (x === 'top' || x === 'bottom') {
       if (x === 'top') {
-        newRect.alignItems = 'flex-end';
-        newRect.top = this._margin;
-        if (y === 'start' || y === 'end') {
-          newRect.height = targetRect.top < 0 ? 0 : targetRect.top - this._margin;
-        } else if (y === 'center') {
-          newRect.height = targetRect.top - this._margin;
-        }
+        newRect.top = scroll ? this._margin : 0;
+        newRect.height = targetRect.top < 0 ? 0 : targetRect.top - (scroll ? this._margin : 0);
+        newRect.alignItems = scroll && newRect.height < elRect.height ? 'flex-start' : 'flex-end';
       } else if (x === 'bottom') {
         newRect.top = targetRect.bottom;
         newRect.height = this.windowSize.height - targetRect.bottom - this._margin;
@@ -112,43 +112,61 @@ export class FFPositionService implements OnDestroy {
         newRect.left = this._margin;
         newRect.justifyContent = 'flex-end';
       } else if (y === 'center') {
-        newRect.width = 'auto';
         newRect.left = (targetRect.left + targetRect.width / 2) - elRect.width / 2;
+        // TODO fix that:
+        newRect.width = 'auto';
       }
     }
     return newRect;
   }
 
-  private _calculatePosition(el, target, x: xAxis, y: yAxis, previous = []) {
+  private _calculatePosition(el, target, x: xAxis, y: yAxis, scroll, previous = []) {
     this._getWindowSize();
     const elRect = el.getBoundingClientRect();
     const targetRect = target.getBoundingClientRect();
-    const wrapperRect = this._calculateStyle(elRect, targetRect, x, y);
+    const wrapperRect = this._calculateStyle(elRect, targetRect, x, y, scroll);
     // TODO remove this shit and make clever method for get new axis;
     if (wrapperRect.width < elRect.width && x === 'right' && previous.indexOf('right') === -1) {
       previous.push('right');
-      return this._calculatePosition(el, target, 'left', y, previous);
+      return this._calculatePosition(el, target, 'left', y, scroll, previous);
     } else if (wrapperRect.width < elRect.width && x === 'left' && previous.indexOf('left') === -1) {
       previous.push('left');
-      return this._calculatePosition(el, target, 'right', y, previous);
+      return this._calculatePosition(el, target, 'right', y, scroll, previous);
     } else if (wrapperRect.height < elRect.height && x === 'top' && previous.indexOf('top') === -1) {
       previous.push('top');
-      return this._calculatePosition(el, target, 'bottom', y, previous);
+      return this._calculatePosition(el, target, 'bottom', y, scroll, previous);
     } else if (wrapperRect.height < elRect.height && x === 'bottom' && previous.indexOf('bottom') === -1) {
       previous.push('bottom');
-      return this._calculatePosition(el, target, 'top', y, previous);
+      return this._calculatePosition(el, target, 'top', y, scroll, previous);
     }
     return wrapperRect;
   }
 
-  init(el, target, x: xAxis = 'right', y: yAxis = 'start') {
-    const wrapper = this.createWrapper();
+  private _getAvailable(elRect, targetRect) {
+    const available = [];
+    if (this.windowSize.width - targetRect.right - this._margin >= elRect.width) {
+      available.push({x: 'right'});
+    }
+    if (targetRect.left - this._margin >= elRect.width) {
+      available.push({x: 'left'});
+    }
+    if (targetRect.top - this._margin >= elRect.height) {
+      available.push({x: 'top'});
+    }
+    if (this.windowSize.height - targetRect.bottom - this._margin >= elRect.height) {
+      available.push({x: 'bottom'});
+    }
+    return available;
+  }
+
+  init(el, target, x: xAxis = 'right', y: yAxis = 'start', scroll = false) {
+    const wrapper = this.createWrapper(scroll);
     this.renderer.appendChild(this.overlayService.getOverlay(), wrapper);
     this.renderer.appendChild(wrapper, el);
-    this._subscriptions[0].subscribe(() => {
-      this.setStyle(wrapper, this._calculatePosition(el, target, x, y));
+    this._subscription.subscribe(() => {
+      this.setStyle(wrapper, this._calculatePosition(el, target, x, y, scroll));
     });
-    this.setStyle(wrapper, this._calculatePosition(el, target, x, y));
+    this.setStyle(wrapper, this._calculatePosition(el, target, x, y, scroll));
     return wrapper;
   }
 
@@ -176,12 +194,10 @@ export class FFPositionService implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this._subscriptions.forEach((subscription) => {
-      subscription.unsubscribe();
-    });
+    this._subscription.unsubscribe();
   }
 
-  private createWrapper() {
+  private createWrapper(scroll) {
     const wrapper = this.renderer.createElement('div');
     this.renderer.addClass(wrapper, 'ff-position-wrapper');
     this.renderer.setStyle(wrapper, 'position', 'absolute');
@@ -189,10 +205,11 @@ export class FFPositionService implements OnDestroy {
     this.renderer.setStyle(wrapper, 'top', '0');
     this.renderer.setStyle(wrapper, 'display', 'flex');
     this.renderer.setStyle(wrapper, 'pointer-events', 'none');
-    this.renderer.setStyle(wrapper, 'overflow', 'auto');
-    this.renderer.setStyle(wrapper, 'scrollbar-width', 'none');
-    this.renderer.setStyle(wrapper, '-ms-overflow-style', 'none');
-    (document.styleSheets[0] as any).insertRule('.ff-position-wrapper::-webkit-scrollbar { width: 0; }', 0);
+    this.renderer.setStyle(wrapper, 'overflow', scroll ? 'auto' : 'hidden');
+    /*    this.renderer.setStyle(wrapper, 'overflow', scroll ? 'auto' : 'hidden');
+      this.renderer.setStyle(wrapper, 'scrollbar-width', 'none');
+       this.renderer.setStyle(wrapper, '-ms-overflow-style', 'none');
+       (document.styleSheets[0] as any).insertRule('.ff-position-wrapper::-webkit-scrollbar { width: 0; }', 0);*/
     return wrapper;
   }
 }
