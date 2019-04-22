@@ -1,11 +1,10 @@
 import {NgModule} from '@angular/core';
 import {FFOverlayModule} from 'ff-overlay';
+import {FFResizeSensorModule} from 'ff-resize-sensor';
 
 @NgModule({
-  declarations: [],
-  entryComponents: [],
-  imports: [FFOverlayModule],
-  exports: [],
+  imports: [FFOverlayModule,
+  FFResizeSensorModule],
 })
 export class FFPositionModule {
 }

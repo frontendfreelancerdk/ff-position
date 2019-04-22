@@ -1,9 +1,12 @@
 {
   "name": "ff-position",
-  "version": "0.0.4",
+  "version": "0.0.5",
+  "dependencies": {
+    "ff-overlay": "^0.0.4",
+    "ff-resize-sensor": "^0.0.1"
+  },
   "peerDependencies": {
     "@angular/common": "^7.0.0",
-    "@angular/core": "^7.0.0",
-    "ff-overlay": "^0.0.2"
+    "@angular/core": "^7.0.0"
   }
 }

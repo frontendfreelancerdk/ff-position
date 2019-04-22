@@ -152,7 +152,8 @@
           "options": {
             "main": "projects/ff-position/src/test.ts",
             "tsConfig": "projects/ff-position/tsconfig.spec.json",
-            "karmaConfig": "projects/ff-position/karma.conf.js"
+            "karmaConfig": "projects/ff-position/karma.conf.js",
+            "codeCoverage": true
           }
         },
         "lint": {

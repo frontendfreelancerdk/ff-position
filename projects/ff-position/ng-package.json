@@ -2,6 +2,14 @@
   "$schema": "../../node_modules/ng-packagr/ng-package.schema.json",
   "dest": "../../dist/ff-position",
   "lib": {
-    "entryFile": "src/public_api.ts"
-  }
+    "entryFile": "src/public_api.ts",
+    "umdModuleIds": {
+      "ff-overlay": "ff-overlay",
+      "ff-resize-sensor": "ff-resize-sensor"
+    }
+  },
+  "whitelistedNonPeerDependencies": [
+    "ff-overlay",
+    "ff-resize-sensor"
+  ]
 }

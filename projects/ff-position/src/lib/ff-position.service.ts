@@ -1,16 +1,15 @@
 import {
-  Inject,
   Injectable,
   OnDestroy,
   Renderer2,
   RendererFactory2
 } from '@angular/core';
-import {DOCUMENT} from '@angular/common';
 
 import {from, fromEvent} from 'rxjs';
 import {mergeMap} from 'rxjs/operators';
 import {FFOverlayService} from 'ff-overlay';
 import {xAxis, yAxis} from './ff-position.types';
+import {FFResizeSensorService} from 'ff-resize-sensor';
 
 export interface Direction {
   x: xAxis;
@@ -30,7 +29,16 @@ export interface BoundingRect {
   providedIn: 'root'
 })
 export class FFPositionService implements OnDestroy {
-  private _margin = 8;
+  // TODO make margin for all directions
+  private _margin = 0;
+  get margin(): number {
+    return this._margin;
+  }
+
+  set margin(val: number) {
+    this._margin = val;
+  }
+
   private _document: Document;
   private renderer: Renderer2;
   private _windowSize = {
@@ -48,8 +56,9 @@ export class FFPositionService implements OnDestroy {
     this._windowSize = size;
   }
 
-  constructor(private overlayService: FFOverlayService, rendererFactory: RendererFactory2,
-              @Inject(DOCUMENT) document?: any) {
+  constructor(private overlayService: FFOverlayService,
+              private resizeService: FFResizeSensorService,
+              rendererFactory: RendererFactory2) {
     this._document = document as Document;
     this.renderer = rendererFactory.createRenderer(null, null);
 
@@ -60,7 +69,6 @@ export class FFPositionService implements OnDestroy {
       if (e.type !== 'scroll') {
         this._getWindowSize();
       }
-
     });
   }
 
@@ -77,19 +85,19 @@ export class FFPositionService implements OnDestroy {
     if (x === 'right' || x === 'left') {
       if (x === 'right') {
         newRect.left = targetRect.right;
-        newRect.width = this._windowSize.width - targetRect.right - this._margin;
+        newRect.width = this._windowSize.width - targetRect.right - this.margin;
       } else if (x === 'left') {
-        newRect.width = targetRect.left - this._margin;
-        newRect.left = this._margin;
+        newRect.width = targetRect.left - this.margin;
+        newRect.left = this.margin;
         newRect.justifyContent = 'flex-end';
       }
       if (y === 'start') {
         newRect.top = targetRect.top;
-        newRect.height = this.windowSize.height - targetRect.top - (scroll ? this._margin : 0);
+        newRect.height = this.windowSize.height - targetRect.top - (scroll ? this.margin : 0);
       } else if (y === 'end') {
-        newRect.height = (targetRect.top + targetRect.height) < 0 ? 0 : (targetRect.top + targetRect.height - this._margin);
+        newRect.height = (targetRect.top + targetRect.height) < 0 ? 0 : (targetRect.top + targetRect.height - this.margin);
         newRect.alignItems = (newRect.height <= elRect.height && scroll) ? 'flex-start' : 'flex-end';
-        newRect.top = this._margin;
+        newRect.top = this.margin;
       } else if (y === 'center') {
         newRect.top = (targetRect.top + targetRect.height / 2) - elRect.height / 2;
         // TODO fix that:
@@ -97,19 +105,19 @@ export class FFPositionService implements OnDestroy {
       }
     } else if (x === 'top' || x === 'bottom') {
       if (x === 'top') {
-        newRect.top = scroll ? this._margin : 0;
-        newRect.height = targetRect.top < 0 ? 0 : targetRect.top - (scroll ? this._margin : 0);
+        newRect.top = scroll ? this.margin : 0;
+        newRect.height = targetRect.top < 0 ? 0 : targetRect.top - (scroll ? this.margin : 0);
         newRect.alignItems = scroll && newRect.height < elRect.height ? 'flex-start' : 'flex-end';
       } else if (x === 'bottom') {
         newRect.top = targetRect.bottom;
-        newRect.height = this.windowSize.height - targetRect.bottom - this._margin;
+        newRect.height = this.windowSize.height - targetRect.bottom - this.margin;
       }
       if (y === 'start') {
         newRect.left = targetRect.left;
-        newRect.width = this.windowSize.width - targetRect.left - this._margin;
+        newRect.width = this.windowSize.width - targetRect.left - this.margin;
       } else if (y === 'end') {
-        newRect.width = targetRect.right - this._margin;
-        newRect.left = this._margin;
+        newRect.width = targetRect.right - this.margin;
+        newRect.left = this.margin;
         newRect.justifyContent = 'flex-end';
       } else if (y === 'center') {
         newRect.left = (targetRect.left + targetRect.width / 2) - elRect.width / 2;
@@ -144,16 +152,16 @@ export class FFPositionService implements OnDestroy {
 
   private _getAvailable(elRect, targetRect) {
     const available = [];
-    if (this.windowSize.width - targetRect.right - this._margin >= elRect.width) {
+    if (this.windowSize.width - targetRect.right - this.margin >= elRect.width) {
       available.push({x: 'right'});
     }
-    if (targetRect.left - this._margin >= elRect.width) {
+    if (targetRect.left - this.margin >= elRect.width) {
       available.push({x: 'left'});
     }
-    if (targetRect.top - this._margin >= elRect.height) {
+    if (targetRect.top - this.margin >= elRect.height) {
       available.push({x: 'top'});
     }
-    if (this.windowSize.height - targetRect.bottom - this._margin >= elRect.height) {
+    if (this.windowSize.height - targetRect.bottom - this.margin >= elRect.height) {
       available.push({x: 'bottom'});
     }
     return available;
@@ -163,6 +171,9 @@ export class FFPositionService implements OnDestroy {
     const wrapper = this.createWrapper(scroll);
     this.renderer.appendChild(this.overlayService.getOverlay(), wrapper);
     this.renderer.appendChild(wrapper, el);
+    this.resizeService.subscribe(el, (e) => {
+      this.setStyle(wrapper, this._calculatePosition(el, target, x, y, scroll));
+    });
     this._subscription.subscribe(() => {
       this.setStyle(wrapper, this._calculatePosition(el, target, x, y, scroll));
     });
