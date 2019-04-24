@@ -1,8 +1,8 @@
 {
   "name": "ff-position",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "dependencies": {
-    "ff-overlay": "^0.0.4",
+    "ff-overlay": "^0.0.6",
     "ff-resize-sensor": "^0.0.1"
   },
   "peerDependencies": {

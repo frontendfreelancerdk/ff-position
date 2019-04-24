@@ -140,6 +140,7 @@ export class FFPositionService implements OnDestroy {
     } else if (wrapperRect.width < elRect.width && x === 'left' && previous.indexOf('left') === -1) {
       previous.push('left');
       return this._calculatePosition(el, target, 'right', y, scroll, previous);
+    //  TODO else if x===right or left and array has x and left , but wrapper with less then element wiht - use another method
     } else if (wrapperRect.height < elRect.height && x === 'top' && previous.indexOf('top') === -1) {
       previous.push('top');
       return this._calculatePosition(el, target, 'bottom', y, scroll, previous);
@@ -150,26 +151,9 @@ export class FFPositionService implements OnDestroy {
     return wrapperRect;
   }
 
-  private _getAvailable(elRect, targetRect) {
-    const available = [];
-    if (this.windowSize.width - targetRect.right - this.margin >= elRect.width) {
-      available.push({x: 'right'});
-    }
-    if (targetRect.left - this.margin >= elRect.width) {
-      available.push({x: 'left'});
-    }
-    if (targetRect.top - this.margin >= elRect.height) {
-      available.push({x: 'top'});
-    }
-    if (this.windowSize.height - targetRect.bottom - this.margin >= elRect.height) {
-      available.push({x: 'bottom'});
-    }
-    return available;
-  }
-
   init(el, target, x: xAxis = 'right', y: yAxis = 'start', scroll = false) {
     const wrapper = this.createWrapper(scroll);
-    this.renderer.appendChild(this.overlayService.getOverlay(), wrapper);
+    this.overlayService.appendChild(wrapper);
     this.renderer.appendChild(wrapper, el);
     this.resizeService.subscribe(el, (e) => {
       this.setStyle(wrapper, this._calculatePosition(el, target, x, y, scroll));
@@ -183,7 +167,7 @@ export class FFPositionService implements OnDestroy {
 
   destroy(wrapper) {
     if (wrapper) {
-      this.renderer.removeChild(this.overlayService.getOverlay(), wrapper);
+      this.overlayService.removeChild(wrapper);
     }
   }
 
