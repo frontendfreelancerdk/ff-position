@@ -38,8 +38,5 @@ testem.log
 .DS_Store
 Thumbs.db
 
-# Coverage
-/projects/ff-overlay/coverage
-
 # Readme
-/projects/ff-overlay/README.md
+/projects/ff-position/README.md

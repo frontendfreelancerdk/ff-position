@@ -3,7 +3,7 @@ addons:
   chrome: stable
 language: node_js
 node_js:
-- node
+- "10.5.0"
 script:
 - npm run test_lib
 - npm run build_lib
